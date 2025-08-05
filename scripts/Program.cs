@@ -20,50 +20,75 @@ class WinDevCodeExtractor
         if (!Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
-        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw");
+        // Créer les sous-dossiers
+        string fenetresOutput = Path.Combine(outputDirectory, "fenetres");
+        string classesOutput = Path.Combine(outputDirectory, "classes");
 
-        foreach (var inputFile in wdwFiles)
+        Directory.CreateDirectory(fenetresOutput);
+        Directory.CreateDirectory(classesOutput);
+
+        // Fichiers à traiter : .wdw et .wdc
+        var files = Directory.GetFiles(inputDirectory, "*.*", SearchOption.AllDirectories)
+                             .Where(f => f.EndsWith(".wdw", StringComparison.OrdinalIgnoreCase) ||
+                                         f.EndsWith(".wdc", StringComparison.OrdinalIgnoreCase));
+
+        foreach (var file in files)
         {
-            var fileName = Path.GetFileNameWithoutExtension(inputFile);
-            var outputFile = Path.Combine(outputDirectory, $"{fileName}_Code.txt");
+            string extension = Path.GetExtension(file).ToLowerInvariant();
+            string categoryFolder = extension == ".wdw" ? fenetresOutput : classesOutput;
 
-            var lines = File.ReadAllLines(inputFile);
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(file);
+            string outputFilePath = Path.Combine(categoryFolder, $"{fileNameWithoutExt}_Code.txt");
+
+            Console.WriteLine($"🔍 Extraction de : {file}");
+
+            var lines = File.ReadAllLines(file);
             var currentCode = new StringBuilder();
+            var tempBlock = new List<string>();
             bool isInCodeBlock = false;
             int lineNumber = 1;
 
             foreach (var line in lines)
             {
-                var trimmed = line.TrimStart();
-
-                if (trimmed.StartsWith("code : |1+")
-                    || trimmed.StartsWith("code : |1-"))
+                if (line.Trim().StartsWith("code : |1+"))
                 {
                     isInCodeBlock = true;
+                    tempBlock.Clear();
                     continue;
                 }
 
                 if (isInCodeBlock)
                 {
-                    // Si on tombe sur une propriété ou une autre section, on arrête
-                    if (trimmed.StartsWith("type :") || trimmed.StartsWith("name :") || trimmed.StartsWith("enabled :") || trimmed.StartsWith("procedure_id :"))
+                    if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("type :"))
                     {
                         isInCodeBlock = false;
-                        currentCode.AppendLine(); // séparation entre blocs
-                        continue;
-                    }
 
-                    if (!string.IsNullOrWhiteSpace(line))
+                        if (tempBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
+                        {
+                            foreach (var codeLine in tempBlock)
+                            {
+                                if (!string.IsNullOrWhiteSpace(codeLine))
+                                {
+                                    currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {codeLine}");
+                                    lineNumber++;
+                                }
+                            }
+                            currentCode.AppendLine();
+                        }
+                    }
+                    else
                     {
-                        currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {line.TrimEnd()}");
-                        lineNumber++;
+                        tempBlock.Add(line);
                     }
                 }
             }
 
-            File.WriteAllText(outputFile, currentCode.ToString());
-            Console.WriteLine($"✅ Code extrait depuis {inputFile} vers : {outputFile}");
+            File.WriteAllText(outputFilePath, currentCode.ToString());
+            Console.WriteLine($"✅ Code extrait dans : {outputFilePath}");
         }
+
+        Console.WriteLine("✅ Extraction terminée.");
     }
 }
+
 
