@@ -20,7 +20,7 @@ class WinDevCodeExtractor
         if (!Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
-        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw", SearchOption.AllDirectories);
+        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw");
 
         foreach (var inputFile in wdwFiles)
         {
