@@ -1,45 +1,38 @@
-name: Extraction Code WinDev
+name: Extract Windev Code
 
 on:
   push:
     paths:
-      - '*.wdw'
+      - '**.wdw'
+      - '**/Program.cs'
+      - '**/ExtractCode.csproj'
+  workflow_dispatch:
 
 jobs:
-  extract-code:
-    runs-on: windows-latest
+  build-and-run:
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout du dépôt
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Installer .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Créer le dossier de sortie
-      run: mkdir -p extracted_code
+      - name: Restore and Build
+        run: |
+          dotnet build ./src/ExtractCode/ExtractCode.csproj --configuration Release
 
-    - name: Extraire le code des fichiers .wdw
-      run: |
-        $files = Get-ChildItem -Path . -Filter *.wdw
-        foreach ($file in $files) {
-          $inputPath = $file.FullName
-          $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
-          $outputPath = "extracted_code"
-          dotnet run --project scripts/ExtractCode.csproj $inputPath $outputPath
-        }
-      shell: pwsh
+      - name: Run ExtractCode on a sample file
+        run: |
+          mkdir -p output
+          dotnet ./src/ExtractCode/bin/Release/net8.0/ExtractCode.dll "./sample/FEN_LayoutBoh.wdw" "./output"
 
-    - name: Configurer Git
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
+      - name: Upload extracted file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extracted-code
+          path: output/FEN_Layout_Code.txt
 
-    - name: Ajouter les fichiers extraits
-      run: |
-        git add extracted_code/*.txt
-        git commit -m "Mise à jour automatique du code extrait des fenêtres WinDev"
-        git push
-      continue-on-error: true
