@@ -20,7 +20,7 @@ class WinDevCodeExtractor
         if (!Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
-        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw");
+        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw", SearchOption.AllDirectories);
 
         foreach (var inputFile in wdwFiles)
         {
@@ -30,47 +30,41 @@ class WinDevCodeExtractor
             var lines = File.ReadAllLines(inputFile);
             var currentCode = new StringBuilder();
             bool isInCodeBlock = false;
-            var tempBlock = new List<string>();
             int lineNumber = 1;
 
             foreach (var line in lines)
             {
-                if (line.Trim().StartsWith("code : |1+"))
+                var trimmed = line.TrimStart();
+
+                if (trimmed.StartsWith("code : |1+")
+                    || trimmed.StartsWith("code : |1-"))
                 {
                     isInCodeBlock = true;
-                    tempBlock.Clear();
                     continue;
                 }
 
                 if (isInCodeBlock)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("type :"))
+                    // Si on tombe sur une propriété ou une autre section, on arrête
+                    if (trimmed.StartsWith("type :") || trimmed.StartsWith("name :") || trimmed.StartsWith("enabled :") || trimmed.StartsWith("procedure_id :"))
                     {
                         isInCodeBlock = false;
-
-                        if (tempBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
-                        {
-                            foreach (var codeLine in tempBlock)
-                            {
-                                if (!string.IsNullOrWhiteSpace(codeLine))
-                                {
-                                    currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {codeLine}");
-                                    lineNumber++;
-                                }
-                            }
-                            currentCode.AppendLine();
-                        }
+                        currentCode.AppendLine(); // séparation entre blocs
+                        continue;
                     }
-                    else
+
+                    if (!string.IsNullOrWhiteSpace(line))
                     {
-                        tempBlock.Add(line);
+                        currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {line.TrimEnd()}");
+                        lineNumber++;
                     }
                 }
             }
 
             File.WriteAllText(outputFile, currentCode.ToString());
-            Console.WriteLine($"Code extrait depuis {inputFile} vers : {outputFile}");
+            Console.WriteLine($"✅ Code extrait depuis {inputFile} vers : {outputFile}");
         }
     }
 }
+
 
