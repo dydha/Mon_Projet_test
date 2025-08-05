@@ -1,0 +1,31 @@
+   1:       PROCEDURE MaFenêtre()
+   2:    -
+
+
+
+
+
+   3:       procédure MaProcedure1()
+   4:       Info("Procedure1")
+
+   5:       procédure MaProcedure2()
+   6:       Info("Procedure2")
+
+   7:       procédure MaProcedure3()
+   8:       Info("Procedure3")
+
+   9:       procédure MaProcedure4()
+  10:       Info("Procedure 4")
+
+  11:       procédure MaProcedure5()
+  12:       Info("Procedure 5")
+
+  13:       procédure MaProcedure6()
+  14:       Info("Procedure 6")
+
+  15:       procédure MaProcedure7()
+  16:       Info("Procedure 7")
+
+  17:       procédure MaProcedure8()
+  18:       Info("Procedure 8 encore et encore et encore et encore modifié et encore et encore et encore et encore")
+
