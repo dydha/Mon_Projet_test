@@ -134,7 +134,7 @@ window :
      code : |1+
       procédure MaProcedure8()
       
-      Info("Procedure 8 encore et encore modifié")
+      Info("Procedure 8 encore et encore et encore modifié")
      type : 458752
   procedure_templates : []
   property_templates : []
