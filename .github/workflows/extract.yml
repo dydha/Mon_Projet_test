@@ -3,7 +3,7 @@ name: Extraction Code WinDev
 on:
   push:
     paths:
-      - 'export_windev/*.wdw'
+      - '*.wdw'
 
 jobs:
   extract-code:
