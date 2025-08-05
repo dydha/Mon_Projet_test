@@ -3,10 +3,11 @@
    3:         Age est un entier
    4:         Adresse est une chaine
    5:         Sexe est une chaine
-   6:         Pays est une chaine  
-   7:       fin
+   6:         Pays est une chaine
+   7:         Ville est une chaine  
+   8:       fin
 
-   8:       procédure Constructeur()
+   9:       procédure Constructeur()
 
-   9:       procédure Destructeur()
+  10:       procédure Destructeur()
 
