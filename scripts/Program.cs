@@ -17,8 +17,8 @@ class WinDevCodeExtractor
             Console.WriteLine("Usage: ExtractCode <inputFile> <outputFile>");
             return;
         }
-        string inputFile == args[0];
-        string outputFolder = = args[1];
+        string inputFile = args[0];
+        string outputFolder =  args[1];
 
         if (!Directory.Exists(outputFolder))
             Directory.CreateDirectory(outputFolder);
