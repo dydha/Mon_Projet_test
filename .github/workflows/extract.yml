@@ -27,7 +27,7 @@ jobs:
         foreach ($file in $files) {
           $inputPath = $file.FullName
           $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
-          $outputPath = "extracted_code/${baseName}_Code.txt"
+          $outputPath = "extracted_code"
           dotnet run --project scripts/ExtractCode.csproj $inputPath $outputPath
         }
       shell: pwsh
