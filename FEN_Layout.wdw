@@ -109,6 +109,15 @@ window :
       procédure MaProcedure5()
       Info("Procedure 5")
      type : 458752
+   -
+     name : MaProcedure6
+     procedure_id : 1770449813140028944
+     type_code : 14
+     code : |1-
+      procédure MaProcedure6()
+      
+      Info("Procedure 6")
+     type : 458752
   procedure_templates : []
   property_templates : []
  code_parameters :
