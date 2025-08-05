@@ -1,78 +1,76 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 class WinDevCodeExtractor
 {
     static void Main(string[] args)
     {
-        //string inputFile = "C:\\Users\\DydhaMPANDOU\\Downloads\\FEN_LayoutBoh.wdw";
-        //string outputFolder = "C:\\Users\\DydhaMPANDOU\\Downloads\\ExtracteFiles";
-
-
-
         if (args.Length < 2)
         {
-            Console.WriteLine("Usage: ExtractCode <inputFile> <outputFile>");
+            Console.WriteLine("Usage: ExtractCode <inputDirectory> <outputDirectory>");
             return;
         }
-        string inputFile == args[0];
-        string outputFolder = = args[1];
 
-        if (!Directory.Exists(outputFolder))
-            Directory.CreateDirectory(outputFolder);
+        string inputDirectory = args[0];
+        string outputDirectory = args[1];
 
-        var lines = File.ReadAllLines(inputFile);
-        var outputFile = Path.Combine(outputFolder, "FEN_Layout_Code.txt");
-        var currentCode = new StringBuilder();
-        bool isInCodeBlock = false;
-        var tempBlock = new List<string>();
-        int lineNumber = 1;
+        if (!Directory.Exists(outputDirectory))
+            Directory.CreateDirectory(outputDirectory);
 
-        foreach (var line in lines)
+        var wdwFiles = Directory.GetFiles(inputDirectory, "*.wdw", SearchOption.AllDirectories);
+
+        foreach (var inputFile in wdwFiles)
         {
-            if (line.Trim().StartsWith("code : |1+"))
-            {
-                isInCodeBlock = true;
-                tempBlock.Clear();
-                continue;
-            }
+            var fileName = Path.GetFileNameWithoutExtension(inputFile);
+            var outputFile = Path.Combine(outputDirectory, $"{fileName}_Code.txt");
 
-            if (isInCodeBlock)
+            var lines = File.ReadAllLines(inputFile);
+            var currentCode = new StringBuilder();
+            bool isInCodeBlock = false;
+            var tempBlock = new List<string>();
+            int lineNumber = 1;
+
+            foreach (var line in lines)
             {
-                if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("type :"))
+                if (line.Trim().StartsWith("code : |1+"))
                 {
-                    isInCodeBlock = false;
+                    isInCodeBlock = true;
+                    tempBlock.Clear();
+                    continue;
+                }
 
-                  
-                    if (tempBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
+                if (isInCodeBlock)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("type :"))
                     {
-                        foreach (var codeLine in tempBlock)
+                        isInCodeBlock = false;
+
+                        if (tempBlock.Any(l => !string.IsNullOrWhiteSpace(l)))
                         {
-                            if (!string.IsNullOrWhiteSpace(codeLine))
+                            foreach (var codeLine in tempBlock)
                             {
-                                currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {codeLine}");
-                                lineNumber++;
+                                if (!string.IsNullOrWhiteSpace(codeLine))
+                                {
+                                    currentCode.AppendLine($"{lineNumber.ToString().PadLeft(4)}: {codeLine}");
+                                    lineNumber++;
+                                }
                             }
-                           
+                            currentCode.AppendLine();
                         }
-                        currentCode.AppendLine(); 
+                    }
+                    else
+                    {
+                        tempBlock.Add(line);
                     }
                 }
-                else
-                {
-                    tempBlock.Add(line);
-                }
-               
             }
-            
+
+            File.WriteAllText(outputFile, currentCode.ToString());
+            Console.WriteLine($"Code extrait depuis {inputFile} vers : {outputFile}");
         }
-
-        File.WriteAllText(outputFile, currentCode.ToString());
-        Console.WriteLine($"Code extrait avec numéros de ligne dans : {outputFile}");
-
-
-
     }
 }
+
