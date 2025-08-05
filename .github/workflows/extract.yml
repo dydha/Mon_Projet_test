@@ -4,8 +4,7 @@ on:
   push:
     paths:
       - '**.wdw'
-      - '**/Program.cs'
-      - '**/ExtractCode.csproj'
+      - 'scripts/**'
   workflow_dispatch:
 
 jobs:
@@ -21,18 +20,16 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore and Build
-        run: |
-          dotnet build ./src/ExtractCode/ExtractCode.csproj --configuration Release
+      - name: Build ExtractCode
+        run: dotnet build scripts/ExtractCode.csproj --configuration Release
 
-      - name: Run ExtractCode on a sample file
+      - name: Run ExtractCode on all .wdw files
         run: |
           mkdir -p output
-          dotnet ./src/ExtractCode/bin/Release/net8.0/ExtractCode.dll "./sample/FEN_LayoutBoh.wdw" "./output"
+          dotnet scripts/bin/Release/net8.0/ExtractCode.dll . ./output
 
-      - name: Upload extracted file as artifact
+      - name: Upload all extracted .txt files
         uses: actions/upload-artifact@v4
         with:
           name: extracted-code
-          path: output/FEN_Layout_Code.txt
-
+          path: output/*.txt
