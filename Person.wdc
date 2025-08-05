@@ -20,6 +20,7 @@ class :
         Age est un entier
         Adresse est une chaine
         Sexe est une chaine
+        Pays est une chaine  
       fin
      type : 131072
   procedures :
