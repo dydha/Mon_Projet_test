@@ -18,7 +18,8 @@ class :
       Person est une Classe
         Name est une chaîne
         Age est un entier
-        Adresse est une chaine 
+        Adresse est une chaine
+        Sexe est une chaine
       fin
      type : 131072
   procedures :
