@@ -1,0 +1,10 @@
+   1:       Person est une Classe
+   2:         Name est une chaîne
+   3:         Age est un entier
+   4:         Adresse est une chaine 
+   5:       fin
+
+   6:       procédure Constructeur()
+
+   7:       procédure Destructeur()
+
