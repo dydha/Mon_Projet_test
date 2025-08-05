@@ -23,7 +23,7 @@ jobs:
 
     - name: Extraire le code des fichiers .wdw
       run: |
-        $files = Get-ChildItem export_windev -Filter *.wdw
+        $files = Get-ChildItem -Path . -Filter *.wdw
         foreach ($file in $files) {
           $inputPath = $file.FullName
           $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
